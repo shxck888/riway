@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OrgX - 智能組織管理專家</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;700;900&display=swap');
+
+        :root {
+            --lite-cyan: #00f2fe;
+            --lite-blue: #4facfe;
+            --pro-purple: #7028ff;
+            --pro-pink: #ff46b9;
+            --bg-dark: #050505;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: var(--bg-dark);
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+        }
+
+        .gradient-text-lite {
+            background: linear-gradient(135deg, var(--lite-cyan), var(--lite-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .gradient-text-pro {
+            background: linear-gradient(135deg, var(--pro-purple), var(--pro-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .btn-lite {
+            background: linear-gradient(135deg, var(--lite-cyan), var(--lite-blue));
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .btn-pro {
+            background: linear-gradient(135deg, var(--pro-purple), var(--pro-pink));
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card-hover:hover {
+            transform: translateY(-10px);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .hero-glow {
+            position: absolute;
+            width: 40vw;
+            height: 40vw;
+            background: radial-gradient(circle, rgba(112, 40, 255, 0.15) 0%, rgba(5, 5, 5, 0) 70%);
+            top: -10%;
+            right: -10%;
+            z-index: -1;
+        }
+
+        .scroll-reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+
+        .scroll-reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+    <!--導覽列-->
+    <nav class="fixed w-full z-50 px-6 py-4 flex justify-between items-center glass mt-4 mx-auto max-w-6xl left-0 right-0">
+        <div class="text-2xl font-black tracking-tighter">Org<span class="text-blue-500">X</span></div>
+        <div class="hidden md:flex space-x-8 text-sm font-medium">
+            <a href="#lite" class="hover:text-blue-400 transition">Lite 版</a>
+            <a href="#pro" class="hover:text-purple-400 transition">Pro 版</a>
+            <a href="#compare" class="hover:text-gray-400 transition">功能對比</a>
+        </div>
+        <button class="bg-white text-black px-6 py-2 rounded-full text-sm font-bold hover:bg-gray-200 transition">立即諮詢</button>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative pt-40 pb-20 px-6 text-center overflow-hidden">
+        <div class="hero-glow"></div>
+        <div class="max-w-4xl mx-auto">
+            <h1 class="text-5xl md:text-7xl font-black mb-6 leading-tight">
+                掌握組織脈絡<br>
+                <span class="gradient-text-pro">倍增經營收益</span>
+            </h1>
+            <p class="text-gray-400 text-lg md:text-xl mb-10 max-w-2xl mx-auto">
+                OrgX 提供全方位的組織管理解決方案。無論是日常行動查看，還是深度的戰略決策，我們都能助您一針見血。
+            </p>
+            <div class="flex flex-col md:flex-row justify-center gap-4">
+                <a href="#lite" class="px-8 py-4 rounded-2xl glass border-blue-500/30 hover:bg-blue-500/10 transition">
+                    📱 了解 Lite 行動版
+                </a>
+                <a href="#pro" class="px-8 py-4 rounded-2xl glass border-purple-500/30 hover:bg-purple-500/10 transition">
+                    💻 了解 Pro 旗艦版
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Lite Version -->
+    <section id="lite" class="py-20 px-6 max-w-6xl mx-auto scroll-reveal">
+        <div class="flex flex-col lg:flex-row items-center gap-12">
+            <div class="lg:w-1/2">
+                <div class="inline-block px-4 py-1 rounded-full bg-blue-500/10 text-blue-400 text-sm font-bold mb-4">
+                    Daily Efficiency
+                </div>
+                <h2 class="text-4xl font-bold mb-6 italic">OrgX <span class="gradient-text-lite font-black">Lite</span></h2>
+                <p class="text-xl text-blue-100/70 mb-8">「讓你每天看組織更快、更順、更直覺」</p>
+                
+                <div class="space-y-6">
+                    <div class="flex gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-sitemap text-blue-400"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg">強化版組織畫面</h4>
+                            <p class="text-gray-400 text-sm">還原熟悉 UI，三單位結構清楚呈現，左右業績一眼可見。</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-bolt text-blue-400"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg">常用會員快速存取</h4>
+                            <p class="text-gray-400 text-sm">一鍵跳轉目標帳號，找人速度提升 3~5 倍，開發現場不卡頓。</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-mobile-alt text-blue-400"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg">跨裝置全面適配</h4>
+                            <p class="text-gray-400 text-sm">支援 iPhone、iPad、Android，行動端流暢操作，隨時隨地管理。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-10 p-6 glass border-blue-500/20">
+                    <div class="text-sm text-blue-400 font-bold mb-2 uppercase tracking-widest">Pricing</div>
+                    <div class="text-4xl font-black mb-4">NT$ 1,680 <span class="text-sm font-normal text-gray-500">/ 年</span></div>
+                    <button class="w-full py-4 rounded-xl btn-lite font-bold text-black hover:shadow-[0_0_20px_rgba(79,172,254,0.5)]">立即升級 Lite 版</button>
+                </div>
+            </div>
+            <div class="lg:w-1/2 relative">
+                <div class="glass p-4 rounded-[2rem] border-blue-500/30 overflow-hidden shadow-2xl">
+                    <div class="bg-gray-900 rounded-[1.5rem] aspect-[9/19] flex items-center justify-center text-gray-700">
+                        <!-- 模擬手機畫面介面 -->
+                        <div class="w-full h-full p-6 flex flex-col">
+                            <div class="h-6 w-1/3 bg-gray-800 rounded mb-8"></div>
+                            <div class="grid grid-cols-2 gap-4 mb-8">
+                                <div class="h-20 bg-blue-500/10 rounded-xl border border-blue-500/20"></div>
+                                <div class="h-20 bg-blue-500/10 rounded-xl border border-blue-500/20"></div>
+                            </div>
+                            <div class="flex-1 bg-gray-800/50 rounded-2xl flex flex-col p-4 items-center">
+                                <div class="w-12 h-12 rounded-full bg-blue-500 mb-4 shadow-[0_0_15px_rgba(79,172,254,0.8)]"></div>
+                                <div class="w-full h-4 bg-gray-700 rounded mb-2"></div>
+                                <div class="w-2/3 h-4 bg-gray-700 rounded mb-10"></div>
+                                <div class="grid grid-cols-2 gap-8 w-full">
+                                    <div class="h-24 bg-gray-700 rounded-xl"></div>
+                                    <div class="h-24 bg-gray-700 rounded-xl"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 裝飾元素 -->
+                <div class="absolute -bottom-6 -right-6 w-32 h-32 bg-blue-500/20 blur-3xl"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pro Version -->
+    <section id="pro" class="py-20 px-6 bg-[#0a0a0a] scroll-reveal">
+        <div class="max-w-6xl mx-auto flex flex-col lg:flex-row-reverse items-center gap-12">
+            <div class="lg:w-1/2">
+                <div class="inline-block px-4 py-1 rounded-full bg-purple-500/10 text-purple-400 text-sm font-bold mb-4">
+                    Strategy & Profit
+                </div>
+                <h2 class="text-4xl font-bold mb-6 italic">OrgX <span class="gradient-text-pro font-black">Pro</span></h2>
+                <p class="text-xl text-purple-100/70 mb-8">「幫你做出最賺錢的決策」</p>
+                
+                <div class="space-y-6">
+                    <div class="flex gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-brain text-purple-400"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg">智能尋碰系統</h4>
+                            <p class="text-gray-400 text-sm">自動分析全組織，找出最佳安置位置，實現利潤最大化，避免人為失誤。</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-vial text-purple-400"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg">模擬新增會員</h4>
+                            <p class="text-gray-400 text-sm">先試算、後操作。模擬放人後的業績變化與碰數預測，決策不再靠感覺。</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-layer-group text-purple-400"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg">深度組織掃描 (10層+)</h4>
+                            <p class="text-gray-400 text-sm">大團隊必備！多層級結構深度掃描，一眼揪出組織平衡問題與潛力點。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-10 p-6 glass border-purple-500/20">
+                    <div class="text-sm text-purple-400 font-bold mb-2 uppercase tracking-widest">Pricing</div>
+                    <div class="text-4xl font-black mb-4">NT$ 19,800 <span class="text-sm font-normal text-gray-500">/ 年</span></div>
+                    <button class="w-full py-4 rounded-xl btn-pro font-bold text-white hover:shadow-[0_0_20px_rgba(112,40,255,0.5)]">立即升級 Pro 旗艦版</button>
+                </div>
+            </div>
+            <div class="lg:w-1/2">
+                <div class="glass p-2 rounded-2xl border-purple-500/30 shadow-2xl">
+                    <div class="bg-gray-900 rounded-xl aspect-video flex flex-col p-4 overflow-hidden">
+                        <!-- 模擬電腦畫面 -->
+                        <div class="flex gap-2 mb-4">
+                            <div class="w-3 h-3 rounded-full bg-red-500/50"></div>
+                            <div class="w-3 h-3 rounded-full bg-yellow-500/50"></div>
+                            <div class="w-3 h-3 rounded-full bg-green-500/50"></div>
+                        </div>
+                        <div class="flex-1 flex gap-4">
+                            <div class="w-1/4 bg-gray-800 rounded-lg p-2 space-y-2">
+                                <div class="h-3 w-full bg-gray-700 rounded"></div>
+                                <div class="h-3 w-2/3 bg-gray-700 rounded"></div>
+                                <div class="h-3 w-full bg-purple-500/30 rounded mt-8"></div>
+                            </div>
+                            <div class="flex-1 bg-gray-800/30 rounded-lg p-4 relative">
+                                <div class="absolute inset-0 border border-purple-500/20 rounded-lg"></div>
+                                <div class="flex justify-center mb-6">
+                                    <div class="w-10 h-10 rounded-lg bg-purple-500 shadow-[0_0_15px_rgba(112,40,255,0.6)]"></div>
+                                </div>
+                                <div class="flex justify-around">
+                                    <div class="w-20 h-12 bg-gray-700/50 rounded flex items-center justify-center">
+                                        <div class="w-6 h-6 rounded-full bg-gray-600"></div>
+                                    </div>
+                                    <div class="w-20 h-12 bg-gray-700/50 rounded flex items-center justify-center">
+                                        <div class="w-6 h-6 rounded-full bg-gray-600"></div>
+                                    </div>
+                                </div>
+                                <div class="mt-8 flex justify-center text-[10px] text-purple-400 font-mono">
+                                    [ AI ANALYZING OPTIMAL PATH... ]
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Comparison Table -->
+    <section id="compare" class="py-20 px-6 scroll-reveal">
+        <div class="max-w-5xl mx-auto text-center mb-16">
+            <h2 class="text-4xl font-bold mb-4">版本功能對比</h2>
+            <p class="text-gray-400">根據您的業務規模與需求選擇最合適的工具</p>
+        </div>
+
+        <div class="max-w-4xl mx-auto overflow-x-auto">
+            <table class="w-full text-left glass overflow-hidden border-collapse">
+                <thead>
+                    <tr class="bg-white/5">
+                        <th class="p-6 font-bold">項目</th>
+                        <th class="p-6 font-bold text-blue-400">Lite 版</th>
+                        <th class="p-6 font-bold text-purple-400">Pro 版</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-white/5">
+                    <tr>
+                        <td class="p-6">使用裝置</td>
+                        <td class="p-6 text-gray-300">📱 手機 / 平板</td>
+                        <td class="p-6 text-gray-300">💻 電腦</td>
+                    </tr>
+                    <tr>
+                        <td class="p-6">核心定位</td>
+                        <td class="p-6 text-gray-300">日常效率</td>
+                        <td class="p-6 text-gray-300 font-bold">收益決策</td>
+                    </tr>
+                    <tr>
+                        <td class="p-6">看組織功能</td>
+                        <td class="p-6 text-green-400"><i class="fas fa-check"></i></td>
+                        <td class="p-6 text-green-400 font-bold"><i class="fas fa-check"></i> (更進階)</td>
+                    </tr>
+                    <tr>
+                        <td class="p-6">常用會員收藏</td>
+                        <td class="p-6 text-green-400"><i class="fas fa-check"></i></td>
+                        <td class="p-6 text-green-400"><i class="fas fa-check"></i></td>
+                    </tr>
+                    <tr>
+                        <td class="p-6">智能尋碰</td>
+                        <td class="p-6 text-gray-600"><i class="fas fa-times"></i></td>
+                        <td class="p-6 text-green-400 font-bold"><i class="fas fa-check"></i> 🔥 核心</td>
+                    </tr>
+                    <tr>
+                        <td class="p-6">模擬新增會員</td>
+                        <td class="p-6 text-gray-600"><i class="fas fa-times"></i></td>
+                        <td class="p-6 text-green-400 font-bold"><i class="fas fa-check"></i> 🔥 神器</td>
+                    </tr>
+                    <tr>
+                        <td class="p-6">深度掃描 (10層+)</td>
+                        <td class="p-6 text-gray-600"><i class="fas fa-times"></i></td>
+                        <td class="p-6 text-green-400 font-bold"><i class="fas fa-check"></i> 🔥 掃描</td>
+                    </tr>
+                    <tr>
+                        <td class="p-6">價值體現</td>
+                        <td class="p-6 text-blue-400">省時間</td>
+                        <td class="p-6 text-purple-400 font-black">賺大錢</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-32 px-6 text-center">
+        <div class="max-w-3xl mx-auto glass p-12 relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-1 btn-pro"></div>
+            <h2 class="text-4xl font-bold mb-6">準備好優化您的組織經營了嗎？</h2>
+            <p class="text-gray-400 mb-10 text-lg">加入超過 1,000+ 位領袖的選擇，讓數據成為您的超能力。</p>
+            <div class="flex flex-col md:flex-row justify-center gap-4">
+                <button class="px-10 py-4 rounded-xl bg-white text-black font-bold hover:bg-gray-200 transition">聯繫業務代表</button>
+                <button class="px-10 py-4 rounded-xl glass font-bold hover:bg-white/10 transition">觀看展示影片</button>
+            </div>
+        </div>
+    </section>
+
+    <footer class="py-10 text-center text-gray-600 text-sm border-t border-white/5">
+        <p>&copy; 2024 OrgX Technology. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // 捲動顯示動畫
+        const observerOptions = {
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.scroll-reveal').forEach(el => {
+            observer.observe(el);
+        });
+
+        // 平滑捲動
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>
