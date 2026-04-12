@@ -19,6 +19,9 @@
         body { font-family: 'Noto Sans TC', sans-serif; }
         .animate-in { animation: fadeIn 0.5s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* 隱藏滾動條但保持功能 */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
 <body class="bg-slate-50">
@@ -118,6 +121,13 @@
                 </button>
             );
 
+            const MobileNavItem = ({ icon, label, active, onClick }) => (
+                <button onClick={onClick} className={`flex-1 flex flex-col items-center justify-center gap-1 transition-all ${active ? 'text-indigo-600' : 'text-slate-400'}`}>
+                    <Icon name={icon} size={22} />
+                    <span className="text-[10px] font-bold">{label}</span>
+                </button>
+            );
+
             if (view === 'login') return (
                 <div className="min-h-screen flex items-center justify-center p-4">
                     <div className="bg-white p-10 rounded-[2.5rem] shadow-2xl w-full max-w-md text-center border">
@@ -131,24 +141,25 @@
             );
 
             return (
-                <div className="min-h-screen flex flex-col">
+                <div className="min-h-screen flex flex-col pb-20 md:pb-0">
                     {notification && (
                         <div className={`fixed top-6 right-6 z-[100] px-6 py-3 rounded-xl shadow-2xl animate-in text-white font-bold ${notification.type === 'error' ? 'bg-rose-500' : 'bg-emerald-500'}`}>
                             {notification.msg}
                         </div>
                     )}
-                    <nav className="bg-white border-b h-16 flex items-center justify-between px-8 sticky top-0 z-50">
+                    <nav className="bg-white border-b h-16 flex items-center justify-between px-6 md:px-8 sticky top-0 z-50">
                         <div className="flex items-center gap-2 font-black text-xl text-indigo-600">
-                            <Icon name="shield-check" size={24} /> <span>天使團隊</span>
-                            <span className="ml-2 text-[10px] bg-indigo-50 px-2 py-0.5 rounded text-indigo-400 uppercase tracking-tighter">{userRole}</span>
+                            <Icon name="shield-check" size={24} /> <span className="hidden xs:inline">天使團隊</span>
+                            <span className="ml-1 text-[10px] bg-indigo-50 px-2 py-0.5 rounded text-indigo-400 uppercase tracking-tighter">{userRole}</span>
                         </div>
-                        <div className="flex items-center gap-4">
-                            <button onClick={() => {setView(view === 'admin' ? 'member' : 'admin'); setActiveTab('dashboard');}} className="text-xs font-bold px-4 py-2 border rounded-full hover:bg-slate-50 transition active:scale-95">切換視角</button>
-                            <button onClick={() => setView('login')} className="text-slate-400 hover:text-rose-500"><Icon name="log-out" /></button>
+                        <div className="flex items-center gap-2 md:gap-4">
+                            <button onClick={() => {setView(view === 'admin' ? 'member' : 'admin'); setActiveTab('dashboard');}} className="text-[10px] md:text-xs font-bold px-3 py-1.5 md:px-4 md:py-2 border rounded-full hover:bg-slate-50 transition active:scale-95">切換視角</button>
+                            <button onClick={() => setView('login')} className="text-slate-400 hover:text-rose-500 p-2"><Icon name="log-out" size={20} /></button>
                         </div>
                     </nav>
 
                     <div className="flex flex-1 max-w-6xl mx-auto w-full">
+                        {/* Desktop Sidebar */}
                         <aside className="w-64 p-6 hidden md:block border-r space-y-2">
                             <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-4">選單</p>
                             {view === 'member' ? (
@@ -168,30 +179,30 @@
                             )}
                         </aside>
 
-                        <main className="flex-1 p-8">
+                        <main className="flex-1 p-4 md:p-8 overflow-x-hidden">
                             <div className="animate-in">
                                 {activeTab === 'dashboard' && view === 'member' && (
-                                    <div className="space-y-8">
-                                        <div className="bg-slate-900 rounded-[2.5rem] p-10 text-white shadow-xl relative overflow-hidden">
+                                    <div className="space-y-6 md:space-y-8">
+                                        <div className="bg-slate-900 rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-10 text-white shadow-xl relative overflow-hidden">
                                             <div className="relative z-10">
                                                 <p className="text-indigo-400 font-bold text-xs mb-1">可用點數</p>
-                                                <h1 className="text-6xl font-black mb-8">{currentPoints.toLocaleString()} <span className="text-xl opacity-40">Pts</span></h1>
-                                                <div className="flex gap-4">
-                                                    <button onClick={() => setActiveTab('checkin')} className="flex-1 bg-white text-slate-900 py-3.5 rounded-2xl font-black text-sm active:scale-95 transition">立即簽到</button>
-                                                    <button onClick={() => setActiveTab('gift')} className="flex-1 bg-indigo-600 text-white py-3.5 rounded-2xl font-black text-sm active:scale-95 transition">禮物兌換</button>
+                                                <h1 className="text-4xl md:text-6xl font-black mb-6 md:mb-8">{currentPoints.toLocaleString()} <span className="text-lg md:text-xl opacity-40">Pts</span></h1>
+                                                <div className="flex gap-3 md:gap-4">
+                                                    <button onClick={() => setActiveTab('checkin')} className="flex-1 bg-white text-slate-900 py-3 md:py-3.5 rounded-xl md:rounded-2xl font-black text-xs md:text-sm active:scale-95 transition">立即簽到</button>
+                                                    <button onClick={() => setActiveTab('gift')} className="flex-1 bg-indigo-600 text-white py-3 md:py-3.5 rounded-xl md:rounded-2xl font-black text-xs md:text-sm active:scale-95 transition">禮物兌換</button>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="bg-white p-6 rounded-3xl border shadow-sm">
+                                        <div className="bg-white p-5 md:p-6 rounded-3xl border shadow-sm">
                                             <h3 className="font-black mb-4">最新異動</h3>
                                             <div className="space-y-4">
                                                 {ledger.slice(0,3).map(l => (
                                                     <div key={l.id} className="flex justify-between items-center py-2 border-b last:border-0 border-slate-50">
                                                         <div className="flex gap-3 items-center">
                                                             <div className={`p-2 rounded-lg ${l.type === 'IN' ? 'bg-emerald-50 text-emerald-500' : 'bg-rose-50 text-rose-500'}`}><Icon name={l.type === 'IN' ? 'arrow-up-right' : 'arrow-down-left'} size={14}/></div>
-                                                            <div><p className="text-sm font-bold">{l.source}</p><p className="text-[10px] text-slate-300">{l.date}</p></div>
+                                                            <div><p className="text-xs md:text-sm font-bold">{l.source}</p><p className="text-[10px] text-slate-300">{l.date}</p></div>
                                                         </div>
-                                                        <p className={`font-black ${l.type === 'IN' ? 'text-emerald-500' : 'text-rose-500'}`}>{l.type === 'IN' ? '+' : '-'}{l.amount}</p>
+                                                        <p className={`text-sm md:text-base font-black ${l.type === 'IN' ? 'text-emerald-500' : 'text-rose-500'}`}>{l.type === 'IN' ? '+' : '-'}{l.amount}</p>
                                                     </div>
                                                 ))}
                                             </div>
@@ -200,14 +211,14 @@
                                 )}
                                 
                                 {activeTab === 'checkin' && (
-                                    <div className="max-w-md mx-auto bg-white p-10 rounded-[2.5rem] shadow-xl border text-center">
-                                        <Icon name="qr-code" size={48} className="mx-auto text-indigo-600 mb-4" />
-                                        <h2 className="text-xl font-black mb-4">活動簽到</h2>
-                                        <p className="text-sm text-slate-400 mb-6">請輸入活動代碼獲取獎勵</p>
+                                    <div className="max-w-md mx-auto bg-white p-6 md:p-10 rounded-[2rem] md:rounded-[2.5rem] shadow-xl border text-center">
+                                        <Icon name="qr-code" size={40} className="mx-auto text-indigo-600 mb-4" />
+                                        <h2 className="text-lg md:text-xl font-black mb-4">活動簽到</h2>
+                                        <p className="text-xs md:text-sm text-slate-400 mb-6">請輸入活動代碼獲取獎勵</p>
                                         <div className="bg-slate-50 rounded-2xl p-4 mb-6">
                                             <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-2">可用的測試代碼</p>
                                             <div className="flex flex-wrap gap-2 justify-center">
-                                                {events.map(e => <span key={e.id} className="text-xs bg-indigo-50 text-indigo-600 px-2 py-1 rounded-lg font-bold">#{e.code}</span>)}
+                                                {events.map(e => <span key={e.id} className="text-[10px] bg-indigo-50 text-indigo-600 px-2 py-1 rounded-lg font-bold">#{e.code}</span>)}
                                             </div>
                                         </div>
                                         <input id="checkinInput" className="w-full bg-slate-50 border-none rounded-2xl px-4 py-4 text-center font-black text-2xl mb-4 outline-none focus:ring-2 focus:ring-indigo-600" placeholder="驗證碼" />
@@ -216,21 +227,21 @@
                                 )}
 
                                 {activeTab === 'gift' && (
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                                         {gifts.map(g => (
                                             <div key={g.id} className="bg-white rounded-3xl border overflow-hidden hover:shadow-xl transition flex flex-col">
-                                                <div className="h-32 bg-slate-50 flex items-center justify-center text-5xl relative">
+                                                <div className="h-28 md:h-32 bg-slate-50 flex items-center justify-center text-4xl md:text-5xl relative">
                                                     {g.image}
-                                                    {g.stock === 0 && <div className="absolute inset-0 bg-white/80 flex items-center justify-center font-black text-rose-500 rotate-12 border-2 border-rose-500 m-4 rounded-xl">已售完</div>}
+                                                    {g.stock === 0 && <div className="absolute inset-0 bg-white/80 flex items-center justify-center font-black text-rose-500 rotate-12 border-2 border-rose-500 m-4 rounded-xl text-xs">已售完</div>}
                                                 </div>
-                                                <div className="p-6 flex-1 flex flex-col">
+                                                <div className="p-4 md:p-6 flex-1 flex flex-col">
                                                     <p className="text-[10px] font-black text-slate-300 uppercase mb-1">{g.category}</p>
-                                                    <h4 className="font-black mb-1">{g.name}</h4>
+                                                    <h4 className="font-black mb-1 text-sm md:text-base">{g.name}</h4>
                                                     <div className="flex justify-between items-center mb-4">
-                                                        <p className="text-indigo-600 font-black">{g.points} Pts</p>
+                                                        <p className="text-indigo-600 font-black text-sm">{g.points} Pts</p>
                                                         <p className="text-[10px] font-bold text-slate-400">剩餘 {g.stock}</p>
                                                     </div>
-                                                    <button onClick={() => handleExchange(g)} disabled={currentPoints < g.points || g.stock === 0} className={`mt-auto w-full py-3 rounded-xl font-bold text-xs ${currentPoints >= g.points && g.stock > 0 ? 'bg-slate-900 text-white active:scale-95' : 'bg-slate-100 text-slate-300 cursor-not-allowed'}`}>立即兌換</button>
+                                                    <button onClick={() => handleExchange(g)} disabled={currentPoints < g.points || g.stock === 0} className={`mt-auto w-full py-2.5 md:py-3 rounded-xl font-bold text-[10px] md:text-xs ${currentPoints >= g.points && g.stock > 0 ? 'bg-slate-900 text-white active:scale-95' : 'bg-slate-100 text-slate-300 cursor-not-allowed'}`}>立即兌換</button>
                                                 </div>
                                             </div>
                                         ))}
@@ -238,44 +249,46 @@
                                 )}
 
                                 {activeTab === 'history' && (
-                                    <div className="bg-white rounded-3xl border overflow-hidden">
-                                        <table className="w-full text-left text-sm">
-                                            <thead className="bg-slate-50 font-black text-[10px] text-slate-400 uppercase"><tr className="border-b"><th className="p-6">項目</th><th className="p-6">時間</th><th className="p-6 text-right">變動</th></tr></thead>
-                                            <tbody className="divide-y">
-                                                {ledger.map(l => (
-                                                    <tr key={l.id} className="hover:bg-slate-50/50 transition">
-                                                        <td className="p-6 font-bold">{l.source}</td>
-                                                        <td className="p-6 text-slate-400">{l.date}</td>
-                                                        <td className={`p-6 text-right font-black ${l.type === 'IN' ? 'text-emerald-500' : 'text-rose-500'}`}>{l.type === 'IN' ? '+' : '-'}{l.amount}</td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
+                                    <div className="bg-white rounded-2xl md:rounded-3xl border overflow-hidden">
+                                        <div className="overflow-x-auto no-scrollbar">
+                                            <table className="w-full text-left text-sm min-w-[400px]">
+                                                <thead className="bg-slate-50 font-black text-[10px] text-slate-400 uppercase"><tr className="border-b"><th className="p-4 md:p-6">項目</th><th className="p-4 md:p-6">時間</th><th className="p-4 md:p-6 text-right">變動</th></tr></thead>
+                                                <tbody className="divide-y">
+                                                    {ledger.map(l => (
+                                                        <tr key={l.id} className="hover:bg-slate-50/50 transition">
+                                                            <td className="p-4 md:p-6 font-bold text-xs md:text-sm">{l.source}</td>
+                                                            <td className="p-4 md:p-6 text-slate-400 text-[10px] md:text-xs">{l.date}</td>
+                                                            <td className={`p-4 md:p-6 text-right font-black text-xs md:text-sm ${l.type === 'IN' ? 'text-emerald-500' : 'text-rose-500'}`}>{l.type === 'IN' ? '+' : '-'}{l.amount}</td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 )}
 
                                 {activeTab === 'dashboard' && view === 'admin' && (
-                                    <div className="space-y-8">
-                                        <div className="grid grid-cols-3 gap-6">
-                                            <div className="bg-white p-6 rounded-3xl border shadow-sm">
+                                    <div className="space-y-6 md:space-y-8">
+                                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6">
+                                            <div className="bg-white p-5 md:p-6 rounded-3xl border shadow-sm">
                                                 <p className="text-[10px] font-black text-slate-400 uppercase mb-2">總發放點數</p>
-                                                <p className="text-3xl font-black text-indigo-600">8,450</p>
+                                                <p className="text-2xl md:text-3xl font-black text-indigo-600">8,450</p>
                                             </div>
-                                            <div className="bg-white p-6 rounded-3xl border shadow-sm">
+                                            <div className="bg-white p-5 md:p-6 rounded-3xl border shadow-sm">
                                                 <p className="text-[10px] font-black text-slate-400 uppercase mb-2">活躍用戶</p>
-                                                <p className="text-3xl font-black">42</p>
+                                                <p className="text-2xl md:text-3xl font-black">42</p>
                                             </div>
-                                            <div className="bg-white p-6 rounded-3xl border shadow-sm">
+                                            <div className="bg-white p-5 md:p-6 rounded-3xl border shadow-sm">
                                                 <p className="text-[10px] font-black text-slate-400 uppercase mb-2">待處理申請</p>
-                                                <p className="text-3xl font-black text-rose-500">{pendingRedemptions.length}</p>
+                                                <p className="text-2xl md:text-3xl font-black text-rose-500">{pendingRedemptions.length}</p>
                                             </div>
                                         </div>
-                                        <div className="bg-indigo-50 p-8 rounded-[2.5rem] flex items-center justify-between">
+                                        <div className="bg-indigo-50 p-6 md:p-8 rounded-[2rem] md:rounded-[2.5rem] flex items-center justify-between">
                                             <div>
-                                                <h3 className="font-black text-xl mb-1 text-indigo-900">營運小提醒</h3>
-                                                <p className="text-indigo-600/70 text-sm">目前有 3 項禮品庫存低於 5 件，建議盡快補貨。</p>
+                                                <h3 className="font-black text-lg md:text-xl mb-1 text-indigo-900">營運小提醒</h3>
+                                                <p className="text-indigo-600/70 text-xs">目前有 3 項禮品庫存低於 5 件。</p>
                                             </div>
-                                            <Icon name="bell" className="text-indigo-400 animate-bounce" size={32} />
+                                            <Icon name="bell" className="text-indigo-400 animate-bounce" size={28} />
                                         </div>
                                     </div>
                                 )}
@@ -283,20 +296,20 @@
                                 {activeTab === 'events' && (
                                     <div className="space-y-6">
                                         <div className="flex justify-between items-center">
-                                            <h3 className="text-xl font-black">活動規則管理</h3>
-                                            <button className="bg-slate-900 text-white px-4 py-2 rounded-xl text-xs font-bold">+ 新增規則</button>
+                                            <h3 className="text-lg md:text-xl font-black">規則管理</h3>
+                                            <button className="bg-slate-900 text-white px-3 py-1.5 md:px-4 md:py-2 rounded-xl text-[10px] md:text-xs font-bold">+ 新增</button>
                                         </div>
                                         <div className="grid gap-4">
                                             {events.map(e => (
-                                                <div key={e.id} className="bg-white p-6 rounded-3xl border flex items-center justify-between hover:border-indigo-200 transition">
-                                                    <div className="flex items-center gap-4">
-                                                        <div className="bg-indigo-50 text-indigo-600 p-3 rounded-2xl font-bold text-xs">{e.type}</div>
+                                                <div key={e.id} className="bg-white p-4 md:p-6 rounded-2xl md:rounded-3xl border flex items-center justify-between hover:border-indigo-200 transition">
+                                                    <div className="flex items-center gap-3 md:gap-4">
+                                                        <div className="bg-indigo-50 text-indigo-600 p-2 md:p-3 rounded-xl md:rounded-2xl font-bold text-[10px]">{e.type}</div>
                                                         <div>
-                                                            <p className="font-black">{e.name}</p>
-                                                            <p className="text-[10px] text-slate-400 font-bold uppercase">代碼: {e.code} | 時間: {e.date}</p>
+                                                            <p className="font-black text-xs md:text-base">{e.name}</p>
+                                                            <p className="text-[8px] md:text-[10px] text-slate-400 font-bold uppercase tracking-tight">代碼: {e.code} | {e.date}</p>
                                                         </div>
                                                     </div>
-                                                    <p className="text-xl font-black text-emerald-500">+{e.points}</p>
+                                                    <p className="text-lg md:text-xl font-black text-emerald-500">+{e.points}</p>
                                                 </div>
                                             ))}
                                         </div>
@@ -306,51 +319,53 @@
                                 {activeTab === 'gifts' && (
                                     <div className="space-y-6">
                                         <div className="flex justify-between items-center">
-                                            <h3 className="text-xl font-black">禮品庫存管理</h3>
-                                            <button className="bg-slate-900 text-white px-4 py-2 rounded-xl text-xs font-bold">+ 上架商品</button>
+                                            <h3 className="text-lg md:text-xl font-black">庫存管理</h3>
+                                            <button className="bg-slate-900 text-white px-3 py-1.5 md:px-4 md:py-2 rounded-xl text-[10px] md:text-xs font-bold">+ 上架</button>
                                         </div>
-                                        <div className="bg-white rounded-3xl border overflow-hidden">
-                                            <table className="w-full text-left text-sm">
-                                                <thead className="bg-slate-50 font-black text-[10px] text-slate-400 uppercase"><tr className="border-b"><th className="p-6">商品名稱</th><th className="p-6">類別</th><th className="p-6">所需點數</th><th className="p-6">庫存</th><th className="p-6">狀態</th></tr></thead>
-                                                <tbody className="divide-y">
-                                                    {gifts.map(g => (
-                                                        <tr key={g.id} className="hover:bg-slate-50/50 transition">
-                                                            <td className="p-6 flex items-center gap-3 font-bold"><span>{g.image}</span> {g.name}</td>
-                                                            <td className="p-6"><span className="bg-slate-100 px-2 py-1 rounded text-[10px] font-bold">{g.category}</span></td>
-                                                            <td className="p-6 font-black text-indigo-600">{g.points}</td>
-                                                            <td className="p-6 font-bold">{g.stock}</td>
-                                                            <td className="p-6">
-                                                                {g.stock > 10 ? <span className="text-emerald-500 text-xs font-bold">充足</span> : 
-                                                                 g.stock > 0 ? <span className="text-amber-500 text-xs font-bold">低庫存</span> : 
-                                                                 <span className="text-rose-500 text-xs font-bold">缺貨</span>}
-                                                            </td>
-                                                        </tr>
-                                                    ))}
-                                                </tbody>
-                                            </table>
+                                        <div className="bg-white rounded-2xl md:rounded-3xl border overflow-hidden">
+                                            <div className="overflow-x-auto no-scrollbar">
+                                                <table className="w-full text-left text-sm min-w-[500px]">
+                                                    <thead className="bg-slate-50 font-black text-[10px] text-slate-400 uppercase"><tr className="border-b"><th className="p-4 md:p-6">名稱</th><th className="p-4 md:p-6">類別</th><th className="p-4 md:p-6">點數</th><th className="p-4 md:p-6">庫存</th><th className="p-4 md:p-6">狀態</th></tr></thead>
+                                                    <tbody className="divide-y">
+                                                        {gifts.map(g => (
+                                                            <tr key={g.id} className="hover:bg-slate-50/50 transition">
+                                                                <td className="p-4 md:p-6 flex items-center gap-3 font-bold text-xs"><span>{g.image}</span> {g.name}</td>
+                                                                <td className="p-4 md:p-6"><span className="bg-slate-100 px-2 py-1 rounded text-[10px] font-bold">{g.category}</span></td>
+                                                                <td className="p-4 md:p-6 font-black text-indigo-600 text-xs">{g.points}</td>
+                                                                <td className="p-4 md:p-6 font-bold text-xs">{g.stock}</td>
+                                                                <td className="p-4 md:p-6">
+                                                                    {g.stock > 10 ? <span className="text-emerald-500 text-[10px] font-bold uppercase">充足</span> : 
+                                                                    g.stock > 0 ? <span className="text-amber-500 text-[10px] font-bold uppercase">低量</span> : 
+                                                                    <span className="text-rose-500 text-[10px] font-bold uppercase">缺貨</span>}
+                                                                </td>
+                                                            </tr>
+                                                        ))}
+                                                    </tbody>
+                                                </table>
+                                            </div>
                                         </div>
                                     </div>
                                 )}
 
                                 {activeTab === 'audit' && (
                                     <div className="space-y-4">
-                                        <h3 className="text-xl font-black mb-4">兌換申請審核</h3>
+                                        <h3 className="text-lg md:text-xl font-black mb-4">申請審核</h3>
                                         {pendingRedemptions.length === 0 ? (
-                                            <div className="bg-slate-50 border-2 border-dashed rounded-[2.5rem] p-20 text-center text-slate-300 font-bold">目前沒有待處理的申請</div>
+                                            <div className="bg-slate-50 border-2 border-dashed rounded-[2rem] p-10 md:p-20 text-center text-slate-300 font-bold text-sm">目前沒有待處理申請</div>
                                         ) : (
                                             pendingRedemptions.map(r => (
-                                                <div key={r.id} className="bg-white p-6 rounded-3xl border flex flex-col md:flex-row justify-between items-center gap-4 animate-in">
-                                                    <div className="flex gap-4 items-center">
-                                                        <div className="bg-indigo-50 text-indigo-600 w-12 h-12 rounded-2xl flex items-center justify-center font-black"><Icon name="gift" /></div>
-                                                        <div>
-                                                            <p className="font-black text-slate-800">{r.user} 申請兌換</p>
-                                                            <p className="text-xs font-bold text-indigo-600">{r.item} <span className="text-slate-300 mx-1">|</span> {r.points} Pts</p>
-                                                            <p className="text-[10px] text-slate-400 mt-1 uppercase font-bold tracking-widest">{r.date}</p>
+                                                <div key={r.id} className="bg-white p-5 md:p-6 rounded-3xl border flex flex-col sm:flex-row justify-between items-center gap-4 animate-in">
+                                                    <div className="flex gap-4 items-center w-full sm:w-auto">
+                                                        <div className="bg-indigo-50 text-indigo-600 w-12 h-12 rounded-2xl flex items-center justify-center font-black flex-shrink-0"><Icon name="gift" /></div>
+                                                        <div className="overflow-hidden">
+                                                            <p className="font-black text-slate-800 text-sm truncate">{r.user} 申請兌換</p>
+                                                            <p className="text-xs font-bold text-indigo-600 truncate">{r.item} • {r.points} Pts</p>
+                                                            <p className="text-[10px] text-slate-400 mt-1 font-bold uppercase tracking-wider">{r.date}</p>
                                                         </div>
                                                     </div>
-                                                    <div className="flex gap-2">
-                                                        <button className="px-6 py-2 border rounded-xl text-xs font-bold text-slate-400 hover:bg-slate-50">駁回</button>
-                                                        <button onClick={() => setPendingRedemptions(pendingRedemptions.filter(x => x.id !== r.id))} className="px-6 py-2 bg-emerald-600 text-white rounded-xl text-xs font-bold shadow-lg shadow-emerald-100 active:scale-95 transition">核准發放</button>
+                                                    <div className="flex gap-2 w-full sm:w-auto">
+                                                        <button className="flex-1 sm:flex-none px-4 py-2 border rounded-xl text-[10px] font-bold text-slate-400 hover:bg-slate-50">駁回</button>
+                                                        <button onClick={() => setPendingRedemptions(pendingRedemptions.filter(x => x.id !== r.id))} className="flex-1 sm:flex-none px-4 py-2 bg-emerald-600 text-white rounded-xl text-[10px] font-bold shadow-lg shadow-emerald-100 active:scale-95 transition">核准</button>
                                                     </div>
                                                 </div>
                                             ))
@@ -360,6 +375,25 @@
                             </div>
                         </main>
                     </div>
+
+                    {/* Mobile Bottom Navigation */}
+                    <footer className="md:hidden fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-md border-t h-16 flex items-center justify-around px-2 z-[60]">
+                        {view === 'member' ? (
+                            <>
+                                <MobileNavItem active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} icon="layout-dashboard" label="首頁" />
+                                <MobileNavItem active={activeTab === 'checkin'} onClick={() => setActiveTab('checkin')} icon="qr-code" label="簽到" />
+                                <MobileNavItem active={activeTab === 'gift'} onClick={() => setActiveTab('gift')} icon="gift" label="兌換" />
+                                <MobileNavItem active={activeTab === 'history'} onClick={() => setActiveTab('history')} icon="history" label="明細" />
+                            </>
+                        ) : (
+                            <>
+                                <MobileNavItem active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} icon="bar-chart-3" label="總覽" />
+                                <MobileNavItem active={activeTab === 'events'} onClick={() => setActiveTab('events')} icon="activity" label="活動" />
+                                <MobileNavItem active={activeTab === 'gifts'} onClick={() => setActiveTab('gifts')} icon="package" label="庫存" />
+                                <MobileNavItem active={activeTab === 'audit'} onClick={() => setActiveTab('audit')} icon="shield-check" label="審核" />
+                            </>
+                        )}
+                    </footer>
                 </div>
             );
         };
