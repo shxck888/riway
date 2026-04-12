@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>天使團隊 - 點數積分管理系統</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons (UMD version) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- React & ReactDOM CDN -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- Babel for JSX transformation in browser -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap');
+        body { font-family: 'Noto Sans TC', sans-serif; }
+        .animate-in { animation: fadeIn 0.5s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="bg-slate-50">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useMemo, useEffect } = React;
+
+        // --- 內置 Lucide 圖標組件 ---
+        const Icon = ({ name, size = 20, className = "" }) => {
+            useEffect(() => {
+                if (window.lucide) {
+                    window.lucide.createIcons();
+                }
+            }, [name]);
+            return <i data-lucide={name} style={{ width: size, height: size }} className={className}></i>;
+        };
+
+        // --- 擴充後的模擬數據 ---
+        const INITIAL_GIFTS = [
+            { id: 1, name: '星巴克大杯拿鐵', points: 150, stock: 45, image: '☕', category: '飲品' },
+            { id: 2, name: '超商 100 元購物金', points: 100, stock: 120, image: '🏪', category: '禮券' },
+            { id: 3, name: '威秀影城電影票', points: 300, stock: 15, image: '🎬', category: '娛樂' },
+            { id: 4, name: 'iPad Air (M2)', points: 15000, stock: 2, image: '📱', category: '電子產品' },
+            { id: 5, name: '天使團隊專屬帽T', points: 800, stock: 30, image: '👕', category: '周邊' },
+            { id: 6, name: '1對1 領導力諮詢', points: 500, stock: 5, image: '🗣️', category: '服務' },
+            { id: 7, name: 'Netflix 1個月會籍', points: 400, stock: 0, image: '📺', category: '數位' },
+            { id: 8, name: '精選研磨咖啡豆(半磅)', points: 600, stock: 12, image: '🫘', category: '飲品' },
+            { id: 9, name: '團隊慶功晚宴門票', points: 1200, stock: 8, image: '🥂', category: '活動' },
+        ];
+
+        const INITIAL_EVENTS = [
+            { id: 'EVT001', name: '天使團隊週年慶', code: 'ANGEL11', points: 50, date: '2023-10-30', type: '簽到' },
+            { id: 'EVT002', name: '幹部培訓講座', code: 'LEADER99', points: 100, date: '2023-11-05', type: '講座' },
+            { id: 'EVT003', name: '每週健康步數達成', code: 'WALK77', points: 30, date: '每週', type: '任務' },
+            { id: 'EVT004', name: '新進人員引導問卷', code: 'SURVEY22', points: 20, date: '一次性', type: '問卷' },
+            { id: 'EVT005', name: '專案KPI優選獎勵', code: 'PROJ88', points: 500, date: '2023-12-31', type: '績效' },
+        ];
+
+        const INITIAL_LEDGER = [
+            { id: 'L1', type: 'IN', source: '系統贈送', amount: 500, date: '2023-10-01 10:00', status: '已確認' },
+            { id: 'L2', type: 'IN', source: '每日簽到', amount: 10, date: '2023-10-25 09:00', status: '已確認' },
+            { id: 'L3', type: 'OUT', source: '兌換: 拿鐵', amount: 150, date: '2023-10-26 15:30', status: '已完成' },
+        ];
+
+        // --- 主程式 ---
+        const App = () => {
+            const [view, setView] = useState('login'); 
+            const [activeTab, setActiveTab] = useState('dashboard');
+            const [isLoggedIn, setIsLoggedIn] = useState(false);
+            const [userRole, setUserRole] = useState('member');
+            const [notification, setNotification] = useState(null);
+
+            const [ledger, setLedger] = useState(INITIAL_LEDGER);
+            const [gifts, setGifts] = useState(INITIAL_GIFTS);
+            const [events, setEvents] = useState(INITIAL_EVENTS);
+            const [pendingRedemptions, setPendingRedemptions] = useState([
+                { id: 'R1', user: '王小明', item: '星巴克大杯拿鐵', points: 150, date: '2023-10-26 10:20', status: '待審核' },
+                { id: 'R2', user: '陳大文', item: 'iPad Air (M2)', points: 15000, date: '2023-10-26 11:45', status: '待審核' },
+            ]);
+
+            const currentPoints = useMemo(() => ledger.reduce((acc, curr) => curr.type === 'IN' ? acc + curr.amount : acc - curr.amount, 0), [ledger]);
+
+            const showToast = (msg, type = 'success') => {
+                setNotification({ msg, type });
+                setTimeout(() => setNotification(null), 3000);
+            };
+
+            const handleLogin = (acc, pwd) => {
+                if (acc === 'admin' && pwd === 'admin') {
+                    setIsLoggedIn(true); setUserRole('admin'); setView('admin'); showToast('管理者登入成功');
+                } else {
+                    setIsLoggedIn(true); setUserRole('member'); setView('member'); showToast('一般會員登入成功');
+                }
+            };
+
+            const handleCheckIn = (code) => {
+                const event = events.find(e => e.code === code);
+                if (!event) return showToast('無效代碼', 'error');
+                setLedger([{ id: Date.now(), type: 'IN', source: `活動: ${event.name}`, amount: event.points, date: new Date().toLocaleString(), status: '已確認' }, ...ledger]);
+                showToast(`簽到成功！+${event.points} 點`);
+            };
+
+            const handleExchange = (gift) => {
+                if (currentPoints < gift.points) return showToast('餘額不足', 'error');
+                setGifts(gifts.map(g => g.id === gift.id ? {...g, stock: g.stock - 1} : g));
+                setLedger([{ id: Date.now(), type: 'OUT', source: `兌換: ${gift.name}`, amount: gift.points, date: new Date().toLocaleString(), status: '已完成' }, ...ledger]);
+                setPendingRedemptions([{ id: Date.now(), user: '展示帳戶', item: gift.name, points: gift.points, date: new Date().toLocaleString(), status: '待審核' }, ...pendingRedemptions]);
+                showToast('申請成功');
+                setActiveTab('history');
+            };
+
+            const SidebarItem = ({ icon, label, active, onClick }) => (
+                <button onClick={onClick} className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all ${active ? 'bg-indigo-600 text-white shadow-lg font-bold' : 'text-slate-500 hover:bg-slate-100'}`}>
+                    <Icon name={icon} size={18} />
+                    <span className="text-sm">{label}</span>
+                </button>
+            );
+
+            if (view === 'login') return (
+                <div className="min-h-screen flex items-center justify-center p-4">
+                    <div className="bg-white p-10 rounded-[2.5rem] shadow-2xl w-full max-w-md text-center border">
+                        <div className="inline-block p-5 bg-indigo-600 rounded-3xl text-white mb-6 shadow-xl"><Icon name="shield-check" size={40} /></div>
+                        <h2 className="text-2xl font-black mb-2">天使團隊平台</h2>
+                        <p className="text-slate-400 text-sm mb-8">展示帳號：admin / admin</p>
+                        <button onClick={() => handleLogin('admin','admin')} className="w-full bg-indigo-600 text-white py-4 rounded-2xl font-black hover:bg-indigo-700 shadow-lg mb-3 transition active:scale-95">管理者登入</button>
+                        <button onClick={() => handleLogin('user','user')} className="w-full bg-white text-slate-600 border border-slate-200 py-4 rounded-2xl font-black hover:bg-slate-50 transition active:scale-95">一般會員登入</button>
+                    </div>
+                </div>
+            );
+
+            return (
+                <div className="min-h-screen flex flex-col">
+                    {notification && (
+                        <div className={`fixed top-6 right-6 z-[100] px-6 py-3 rounded-xl shadow-2xl animate-in text-white font-bold ${notification.type === 'error' ? 'bg-rose-500' : 'bg-emerald-500'}`}>
+                            {notification.msg}
+                        </div>
+                    )}
+                    <nav className="bg-white border-b h-16 flex items-center justify-between px-8 sticky top-0 z-50">
+                        <div className="flex items-center gap-2 font-black text-xl text-indigo-600">
+                            <Icon name="shield-check" size={24} /> <span>天使團隊</span>
+                            <span className="ml-2 text-[10px] bg-indigo-50 px-2 py-0.5 rounded text-indigo-400 uppercase tracking-tighter">{userRole}</span>
+                        </div>
+                        <div className="flex items-center gap-4">
+                            <button onClick={() => {setView(view === 'admin' ? 'member' : 'admin'); setActiveTab('dashboard');}} className="text-xs font-bold px-4 py-2 border rounded-full hover:bg-slate-50 transition active:scale-95">切換視角</button>
+                            <button onClick={() => setView('login')} className="text-slate-400 hover:text-rose-500"><Icon name="log-out" /></button>
+                        </div>
+                    </nav>
+
+                    <div className="flex flex-1 max-w-6xl mx-auto w-full">
+                        <aside className="w-64 p-6 hidden md:block border-r space-y-2">
+                            <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-4">選單</p>
+                            {view === 'member' ? (
+                                <>
+                                    <SidebarItem active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} icon="layout-dashboard" label="儀表板" />
+                                    <SidebarItem active={activeTab === 'checkin'} onClick={() => setActiveTab('checkin')} icon="qr-code" label="活動簽到" />
+                                    <SidebarItem active={activeTab === 'history'} onClick={() => setActiveTab('history')} icon="history" label="點數帳本" />
+                                    <SidebarItem active={activeTab === 'gift'} onClick={() => setActiveTab('gift')} icon="gift" label="禮品兌換" />
+                                </>
+                            ) : (
+                                <>
+                                    <SidebarItem active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} icon="bar-chart-3" label="數據總覽" />
+                                    <SidebarItem active={activeTab === 'events'} onClick={() => setActiveTab('events')} icon="activity" label="活動管理" />
+                                    <SidebarItem active={activeTab === 'gifts'} onClick={() => setActiveTab('gifts')} icon="package" label="庫存管理" />
+                                    <SidebarItem active={activeTab === 'audit'} onClick={() => setActiveTab('audit')} icon="shield-check" label="審核中心" />
+                                </>
+                            )}
+                        </aside>
+
+                        <main className="flex-1 p-8">
+                            <div className="animate-in">
+                                {activeTab === 'dashboard' && view === 'member' && (
+                                    <div className="space-y-8">
+                                        <div className="bg-slate-900 rounded-[2.5rem] p-10 text-white shadow-xl relative overflow-hidden">
+                                            <div className="relative z-10">
+                                                <p className="text-indigo-400 font-bold text-xs mb-1">可用點數</p>
+                                                <h1 className="text-6xl font-black mb-8">{currentPoints.toLocaleString()} <span className="text-xl opacity-40">Pts</span></h1>
+                                                <div className="flex gap-4">
+                                                    <button onClick={() => setActiveTab('checkin')} className="flex-1 bg-white text-slate-900 py-3.5 rounded-2xl font-black text-sm active:scale-95 transition">立即簽到</button>
+                                                    <button onClick={() => setActiveTab('gift')} className="flex-1 bg-indigo-600 text-white py-3.5 rounded-2xl font-black text-sm active:scale-95 transition">禮物兌換</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="bg-white p-6 rounded-3xl border shadow-sm">
+                                            <h3 className="font-black mb-4">最新異動</h3>
+                                            <div className="space-y-4">
+                                                {ledger.slice(0,3).map(l => (
+                                                    <div key={l.id} className="flex justify-between items-center py-2 border-b last:border-0 border-slate-50">
+                                                        <div className="flex gap-3 items-center">
+                                                            <div className={`p-2 rounded-lg ${l.type === 'IN' ? 'bg-emerald-50 text-emerald-500' : 'bg-rose-50 text-rose-500'}`}><Icon name={l.type === 'IN' ? 'arrow-up-right' : 'arrow-down-left'} size={14}/></div>
+                                                            <div><p className="text-sm font-bold">{l.source}</p><p className="text-[10px] text-slate-300">{l.date}</p></div>
+                                                        </div>
+                                                        <p className={`font-black ${l.type === 'IN' ? 'text-emerald-500' : 'text-rose-500'}`}>{l.type === 'IN' ? '+' : '-'}{l.amount}</p>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                                
+                                {activeTab === 'checkin' && (
+                                    <div className="max-w-md mx-auto bg-white p-10 rounded-[2.5rem] shadow-xl border text-center">
+                                        <Icon name="qr-code" size={48} className="mx-auto text-indigo-600 mb-4" />
+                                        <h2 className="text-xl font-black mb-4">活動簽到</h2>
+                                        <p className="text-sm text-slate-400 mb-6">請輸入活動代碼獲取獎勵</p>
+                                        <div className="bg-slate-50 rounded-2xl p-4 mb-6">
+                                            <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-2">可用的測試代碼</p>
+                                            <div className="flex flex-wrap gap-2 justify-center">
+                                                {events.map(e => <span key={e.id} className="text-xs bg-indigo-50 text-indigo-600 px-2 py-1 rounded-lg font-bold">#{e.code}</span>)}
+                                            </div>
+                                        </div>
+                                        <input id="checkinInput" className="w-full bg-slate-50 border-none rounded-2xl px-4 py-4 text-center font-black text-2xl mb-4 outline-none focus:ring-2 focus:ring-indigo-600" placeholder="驗證碼" />
+                                        <button onClick={() => handleCheckIn(document.getElementById('checkinInput').value.toUpperCase())} className="w-full bg-indigo-600 text-white py-4 rounded-2xl font-black active:scale-95 transition">確認</button>
+                                    </div>
+                                )}
+
+                                {activeTab === 'gift' && (
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                        {gifts.map(g => (
+                                            <div key={g.id} className="bg-white rounded-3xl border overflow-hidden hover:shadow-xl transition flex flex-col">
+                                                <div className="h-32 bg-slate-50 flex items-center justify-center text-5xl relative">
+                                                    {g.image}
+                                                    {g.stock === 0 && <div className="absolute inset-0 bg-white/80 flex items-center justify-center font-black text-rose-500 rotate-12 border-2 border-rose-500 m-4 rounded-xl">已售完</div>}
+                                                </div>
+                                                <div className="p-6 flex-1 flex flex-col">
+                                                    <p className="text-[10px] font-black text-slate-300 uppercase mb-1">{g.category}</p>
+                                                    <h4 className="font-black mb-1">{g.name}</h4>
+                                                    <div className="flex justify-between items-center mb-4">
+                                                        <p className="text-indigo-600 font-black">{g.points} Pts</p>
+                                                        <p className="text-[10px] font-bold text-slate-400">剩餘 {g.stock}</p>
+                                                    </div>
+                                                    <button onClick={() => handleExchange(g)} disabled={currentPoints < g.points || g.stock === 0} className={`mt-auto w-full py-3 rounded-xl font-bold text-xs ${currentPoints >= g.points && g.stock > 0 ? 'bg-slate-900 text-white active:scale-95' : 'bg-slate-100 text-slate-300 cursor-not-allowed'}`}>立即兌換</button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {activeTab === 'history' && (
+                                    <div className="bg-white rounded-3xl border overflow-hidden">
+                                        <table className="w-full text-left text-sm">
+                                            <thead className="bg-slate-50 font-black text-[10px] text-slate-400 uppercase"><tr className="border-b"><th className="p-6">項目</th><th className="p-6">時間</th><th className="p-6 text-right">變動</th></tr></thead>
+                                            <tbody className="divide-y">
+                                                {ledger.map(l => (
+                                                    <tr key={l.id} className="hover:bg-slate-50/50 transition">
+                                                        <td className="p-6 font-bold">{l.source}</td>
+                                                        <td className="p-6 text-slate-400">{l.date}</td>
+                                                        <td className={`p-6 text-right font-black ${l.type === 'IN' ? 'text-emerald-500' : 'text-rose-500'}`}>{l.type === 'IN' ? '+' : '-'}{l.amount}</td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                )}
+
+                                {activeTab === 'dashboard' && view === 'admin' && (
+                                    <div className="space-y-8">
+                                        <div className="grid grid-cols-3 gap-6">
+                                            <div className="bg-white p-6 rounded-3xl border shadow-sm">
+                                                <p className="text-[10px] font-black text-slate-400 uppercase mb-2">總發放點數</p>
+                                                <p className="text-3xl font-black text-indigo-600">8,450</p>
+                                            </div>
+                                            <div className="bg-white p-6 rounded-3xl border shadow-sm">
+                                                <p className="text-[10px] font-black text-slate-400 uppercase mb-2">活躍用戶</p>
+                                                <p className="text-3xl font-black">42</p>
+                                            </div>
+                                            <div className="bg-white p-6 rounded-3xl border shadow-sm">
+                                                <p className="text-[10px] font-black text-slate-400 uppercase mb-2">待處理申請</p>
+                                                <p className="text-3xl font-black text-rose-500">{pendingRedemptions.length}</p>
+                                            </div>
+                                        </div>
+                                        <div className="bg-indigo-50 p-8 rounded-[2.5rem] flex items-center justify-between">
+                                            <div>
+                                                <h3 className="font-black text-xl mb-1 text-indigo-900">營運小提醒</h3>
+                                                <p className="text-indigo-600/70 text-sm">目前有 3 項禮品庫存低於 5 件，建議盡快補貨。</p>
+                                            </div>
+                                            <Icon name="bell" className="text-indigo-400 animate-bounce" size={32} />
+                                        </div>
+                                    </div>
+                                )}
+
+                                {activeTab === 'events' && (
+                                    <div className="space-y-6">
+                                        <div className="flex justify-between items-center">
+                                            <h3 className="text-xl font-black">活動規則管理</h3>
+                                            <button className="bg-slate-900 text-white px-4 py-2 rounded-xl text-xs font-bold">+ 新增規則</button>
+                                        </div>
+                                        <div className="grid gap-4">
+                                            {events.map(e => (
+                                                <div key={e.id} className="bg-white p-6 rounded-3xl border flex items-center justify-between hover:border-indigo-200 transition">
+                                                    <div className="flex items-center gap-4">
+                                                        <div className="bg-indigo-50 text-indigo-600 p-3 rounded-2xl font-bold text-xs">{e.type}</div>
+                                                        <div>
+                                                            <p className="font-black">{e.name}</p>
+                                                            <p className="text-[10px] text-slate-400 font-bold uppercase">代碼: {e.code} | 時間: {e.date}</p>
+                                                        </div>
+                                                    </div>
+                                                    <p className="text-xl font-black text-emerald-500">+{e.points}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {activeTab === 'gifts' && (
+                                    <div className="space-y-6">
+                                        <div className="flex justify-between items-center">
+                                            <h3 className="text-xl font-black">禮品庫存管理</h3>
+                                            <button className="bg-slate-900 text-white px-4 py-2 rounded-xl text-xs font-bold">+ 上架商品</button>
+                                        </div>
+                                        <div className="bg-white rounded-3xl border overflow-hidden">
+                                            <table className="w-full text-left text-sm">
+                                                <thead className="bg-slate-50 font-black text-[10px] text-slate-400 uppercase"><tr className="border-b"><th className="p-6">商品名稱</th><th className="p-6">類別</th><th className="p-6">所需點數</th><th className="p-6">庫存</th><th className="p-6">狀態</th></tr></thead>
+                                                <tbody className="divide-y">
+                                                    {gifts.map(g => (
+                                                        <tr key={g.id} className="hover:bg-slate-50/50 transition">
+                                                            <td className="p-6 flex items-center gap-3 font-bold"><span>{g.image}</span> {g.name}</td>
+                                                            <td className="p-6"><span className="bg-slate-100 px-2 py-1 rounded text-[10px] font-bold">{g.category}</span></td>
+                                                            <td className="p-6 font-black text-indigo-600">{g.points}</td>
+                                                            <td className="p-6 font-bold">{g.stock}</td>
+                                                            <td className="p-6">
+                                                                {g.stock > 10 ? <span className="text-emerald-500 text-xs font-bold">充足</span> : 
+                                                                 g.stock > 0 ? <span className="text-amber-500 text-xs font-bold">低庫存</span> : 
+                                                                 <span className="text-rose-500 text-xs font-bold">缺貨</span>}
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {activeTab === 'audit' && (
+                                    <div className="space-y-4">
+                                        <h3 className="text-xl font-black mb-4">兌換申請審核</h3>
+                                        {pendingRedemptions.length === 0 ? (
+                                            <div className="bg-slate-50 border-2 border-dashed rounded-[2.5rem] p-20 text-center text-slate-300 font-bold">目前沒有待處理的申請</div>
+                                        ) : (
+                                            pendingRedemptions.map(r => (
+                                                <div key={r.id} className="bg-white p-6 rounded-3xl border flex flex-col md:flex-row justify-between items-center gap-4 animate-in">
+                                                    <div className="flex gap-4 items-center">
+                                                        <div className="bg-indigo-50 text-indigo-600 w-12 h-12 rounded-2xl flex items-center justify-center font-black"><Icon name="gift" /></div>
+                                                        <div>
+                                                            <p className="font-black text-slate-800">{r.user} 申請兌換</p>
+                                                            <p className="text-xs font-bold text-indigo-600">{r.item} <span className="text-slate-300 mx-1">|</span> {r.points} Pts</p>
+                                                            <p className="text-[10px] text-slate-400 mt-1 uppercase font-bold tracking-widest">{r.date}</p>
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex gap-2">
+                                                        <button className="px-6 py-2 border rounded-xl text-xs font-bold text-slate-400 hover:bg-slate-50">駁回</button>
+                                                        <button onClick={() => setPendingRedemptions(pendingRedemptions.filter(x => x.id !== r.id))} className="px-6 py-2 bg-emerald-600 text-white rounded-xl text-xs font-bold shadow-lg shadow-emerald-100 active:scale-95 transition">核准發放</button>
+                                                    </div>
+                                                </div>
+                                            ))
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        </main>
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
